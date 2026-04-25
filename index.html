@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>神仙數字 · 在數字裡，遇見最真實的自己</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:         #F0E4DC;
+      --bg-alt:     #E4D4CC;
+      --bg-card:    rgba(255,248,244,0.80);
+      --gold:       #8A6060;
+      --gold-light: #A87878;
+      --gold-hover: #6A4848;
+      --gold-pale:  rgba(138,96,96,0.10);
+      --gold-border:rgba(138,96,96,0.22);
+      --text:       #261018;
+      --text-mid:   #5A3040;
+      --text-dim:   #8A6070;
+      --shadow:     rgba(138,96,96,0.10);
+      --radius:     16px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Noto Serif TC', serif;
+      overflow-x:hidden;
+      line-height:1.85;
+    }
+
+    /* ── STARS ── */
+    #starCanvas {
+      display:none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; width:100%; z-index:100;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:1rem 2.5rem;
+      background:rgba(240,228,220,0.93);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--gold-border);
+    }
+    .nav-logo { color:var(--gold); font-size:1.1rem; font-weight:600; letter-spacing:.08em; }
+    .nav-links a {
+      color:var(--text-dim); text-decoration:none;
+      margin-left:2rem; font-size:.88rem; transition:color .2s;
+    }
+    .nav-links a:hover { color:var(--gold); }
+
+    /* ── HELPERS ── */
+    .wrap { max-width:900px; margin:0 auto; position:relative; z-index:1; }
+    .sec-tag {
+      display:block; text-align:center;
+      font-size:.72rem; letter-spacing:.35em;
+      color:var(--gold); margin-bottom:.7rem; opacity:.8;
+    }
+    .sec-title {
+      font-size:clamp(1.7rem,4vw,2.5rem);
+      font-weight:700; color:var(--text);
+      text-align:center; line-height:1.4;
+    }
+    .sec-line {
+      width:44px; height:2px;
+      background:linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin:.9rem auto 0;
+    }
+    .card {
+      background:var(--bg-card);
+      backdrop-filter:blur(16px);
+      border:1px solid var(--gold-border);
+      border-radius:var(--radius);
+      box-shadow:0 4px 30px var(--shadow);
+    }
+
+    /* ── HERO ── */
+    #home {
+      position:relative; z-index:1;
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center;
+      padding:8rem 1.5rem 5rem;
+    }
+    .hero-badge {
+      font-size:.72rem; letter-spacing:.4em;
+      color:var(--gold); margin-bottom:1.4rem; opacity:.7;
+    }
+    .hero-title {
+      font-size:clamp(2rem,6vw,3.6rem);
+      font-weight:700; color:var(--text);
+      line-height:1.3; margin-bottom:1.4rem;
+      animation:titleGlow 4s ease-in-out infinite;
+    }
+    .hero-title em {
+      color:var(--gold); font-style:normal;
+      text-shadow:0 0 30px rgba(201,162,39,0.5);
+    }
+    @keyframes titleGlow {
+      0%,100%{ text-shadow:none; }
+      50%{ text-shadow:0 0 40px rgba(201,162,39,0.2); }
+    }
+    .hero-sub {
+      font-size:clamp(.9rem,2vw,1.05rem);
+      color:var(--text-mid); letter-spacing:.05em;
+      max-width:440px;
+    }
+    .hero-scroll {
+      margin-top:3rem; color:var(--gold); opacity:.5;
+      animation:bounce 2.4s ease-in-out infinite;
+    }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+    /* ── ABOUT ── */
+    #about { padding:6rem 1.5rem; position:relative; z-index:1; }
+    .about-body { max-width:720px; margin:0 auto; }
+    .about-body p {
+      color:var(--text-mid); line-height:2.25;
+      font-size:1rem; margin-bottom:1.8rem;
+    }
+    .about-body p:last-child { margin-bottom:0; }
+    .highlight-box {
+      background:var(--gold-pale);
+      border-left:3px solid var(--gold);
+      border-radius:0 12px 12px 0;
+      padding:1.3rem 1.8rem;
+      margin:2rem 0;
+      color:var(--text);
+      font-size:.97rem; line-height:2.15;
+    }
+
+    /* ── CALCULATOR ── */
+    #calculator { padding:6rem 1.5rem; position:relative; z-index:1; background:rgba(228,212,204,0.55); }
+    .calc-card { padding:2.5rem 2rem; }
+    .calc-desc {
+      text-align:center; color:var(--text-mid);
+      font-size:.92rem; margin:.8rem 0 2.5rem; line-height:1.9;
+    }
+    .inputs-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:1.5rem; margin-bottom:1.5rem;
+    }
+    .date-box {
+      background:rgba(201,162,39,0.05);
+      border:1px solid var(--gold-border);
+      border-radius:12px; padding:1.6rem;
+    }
+    .date-box-head {
+      font-size:.88rem; font-weight:600; color:var(--text);
+      margin-bottom:1.1rem; display:flex; align-items:center; gap:.6rem;
+    }
+    .cal-tag {
+      font-size:.68rem; background:var(--gold);
+      color:#0d0618; padding:.12rem .55rem; border-radius:50px; font-weight:700;
+    }
+    .cal-note { font-size:.75rem; color:var(--text-dim); font-weight:400; }
+    .date-fields { display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem; }
+    .f-group { display:flex; flex-direction:column; gap:.35rem; }
+    .f-group label { font-size:.75rem; color:var(--text-dim); }
+    .f-group input, .f-group select {
+      background:rgba(201,162,39,0.07);
+      border:1px solid var(--gold-border);
+      border-radius:8px;
+      padding:.55rem .7rem;
+      color:var(--text);
+      font-size:.88rem;
+      font-family:'Noto Serif TC', serif;
+      transition:border-color .2s, background .2s;
+      width:100%; -webkit-appearance:none;
+    }
+    .f-group input:focus, .f-group select:focus {
+      outline:none; border-color:var(--gold);
+      background:rgba(201,162,39,0.13);
+    }
+    .f-group select option { background:#F0E4DC; color:var(--text); }
+    .leap-check {
+      margin-top:.8rem; display:flex; align-items:center; gap:.5rem;
+      font-size:.8rem; color:var(--text-dim); cursor:pointer;
+    }
+    .leap-check input { width:14px; height:14px; accent-color:var(--gold); cursor:pointer; }
+
+    .decode-btn {
+      width:100%; padding:1rem 2rem;
+      background:linear-gradient(135deg, #8A6060, #C49090);
+      border:none; border-radius:50px;
+      color:white; font-size:1.05rem;
+      font-family:'Noto Serif TC', serif; font-weight:600;
+      cursor:pointer; letter-spacing:.18em;
+      transition:all .3s;
+      box-shadow:0 4px 22px rgba(201,162,39,0.30);
+    }
+    .decode-btn:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(201,162,39,0.45); }
+
+    /* Results */
+    .result-area { display:none; margin-top:2rem; }
+    .result-area.show { display:block; animation:fadeUp .45s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .r-card { padding:2rem 1.5rem; text-align:center; }
+    .r-type { font-size:.7rem; letter-spacing:.3em; color:var(--text-dim); margin-bottom:.8rem; }
+    .r-num {
+      font-size:5rem; font-weight:700; color:var(--gold); line-height:1;
+      margin-bottom:.3rem; text-shadow:0 0 30px rgba(201,162,39,0.5);
+    }
+    .r-desc {
+      color:var(--text-mid); font-size:.88rem; line-height:2;
+      text-align:left;
+      background:rgba(0,0,0,0.2); border-radius:10px;
+      padding:1rem 1.2rem; margin-top:1rem;
+    }
+
+    /* ── SERVICES ── */
+    #services { padding:6rem 1.5rem; position:relative; z-index:1; }
+    .svc-intro {
+      max-width:660px; margin:1.5rem auto 2.5rem;
+      text-align:center; color:var(--text-mid);
+      font-size:.97rem; line-height:2.2;
+    }
+    .notice {
+      background:var(--gold-pale);
+      border:1px solid var(--gold-border);
+      border-radius:var(--radius);
+      padding:1.5rem 2rem; margin-bottom:2.5rem;
+      text-align:center; font-size:.9rem;
+      color:var(--text-mid); line-height:2.1;
+    }
+    .notice strong { color:var(--gold); font-size:.95rem; display:block; margin-bottom:.5rem; }
+    .svc-list { display:flex; flex-direction:column; gap:1.2rem; margin-bottom:3rem; }
+    .svc-item {
+      display:flex; gap:1.5rem; padding:2rem 2rem;
+      align-items:flex-start; transition:transform .25s, border-color .25s;
+    }
+    .svc-item:hover { transform:translateX(4px); border-color:rgba(201,162,39,0.5); }
+    .svc-n {
+      font-size:2.2rem; font-weight:700; color:var(--gold);
+      opacity:.35; flex-shrink:0; line-height:1; padding-top:.15rem;
+    }
+    .svc-t { font-size:1rem; font-weight:600; color:var(--text); margin-bottom:.45rem; }
+    .svc-d { font-size:.9rem; color:var(--text-mid); line-height:1.95; }
+
+    .book-area { text-align:center; padding-top:1rem; }
+    .book-area p { color:var(--text-mid); margin-bottom:1.3rem; font-size:.97rem; }
+    .book-btn {
+      display:inline-block; padding:.9rem 2.8rem;
+      background:linear-gradient(135deg, var(--gold), #A8851C);
+      color:#0d0618; text-decoration:none;
+      border-radius:50px; font-weight:700; font-size:.97rem;
+      letter-spacing:.1em; transition:all .3s;
+      box-shadow:0 4px 18px rgba(201,162,39,0.30);
+    }
+    .book-btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(201,162,39,0.45); }
+
+    /* ── FOOTER ── */
+    footer {
+      position:relative; z-index:1;
+      background:rgba(8,4,18,0.95);
+      border-top:1px solid var(--gold-border);
+      padding:3rem 1.5rem; text-align:center;
+    }
+    .ft-logo { color:var(--gold); font-size:1.3rem; font-weight:600; margin-bottom:.4rem; }
+    .ft-sub { color:var(--text-dim); font-size:.82rem; margin-bottom:1.5rem; }
+    .ig-btn {
+      display:inline-flex; align-items:center; gap:.55rem;
+      color:var(--text-mid); text-decoration:none; font-size:.92rem;
+      padding:.65rem 2rem;
+      border:1px solid var(--gold-border);
+      border-radius:50px; transition:all .3s;
+    }
+    .ig-btn:hover {
+      background:linear-gradient(135deg,#E1306C,#833AB4,#FCAF45);
+      border-color:transparent; color:white;
+    }
+    .ft-copy { color:var(--text-dim); opacity:.4; font-size:.72rem; margin-top:1.5rem; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:680px){
+      .inputs-grid, .result-grid { grid-template-columns:1fr; }
+      .nav-links { display:none; }
+      .calc-card { padding:1.8rem 1.2rem; }
+      .svc-item { padding:1.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">✦ 神仙數字</div>
+  <div class="nav-links">
+    <a href="#about">關於神仙數字</a>
+    <a href="#calculator">解碼</a>
+    <a href="#services">服務項目</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-badge">DIVINE NUMEROLOGY</div>
+  <h1 class="hero-title">在數字裡，<br><em>遇見最真實的自己</em></h1>
+  <p class="hero-sub">歡迎來到這裡，這是一個為靈魂準備的安靜角落。</p>
+  <div class="hero-scroll">
+    <svg width="22" height="36" viewBox="0 0 22 36" fill="none">
+      <rect x="1" y="1" width="20" height="28" rx="10" stroke="currentColor" stroke-width="1.6"/>
+      <line x1="11" y1="7" x2="11" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M5 31 L11 35.5 L17 31" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 第一部分：關於神仙數字 -->
+<section id="about">
+  <div class="wrap">
+    <div style="text-align:center; margin-bottom:3rem;">
+      <span class="sec-tag">PART 01 · 神仙數字的由來</span>
+      <h2 class="sec-title">在數字裡，遇見最真實的自己</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="about-body">
+      <p>
+        我們每個人出生的那一刻，都帶著一份獨一無二的密碼。神仙數字不只是數學，它是宇宙傳遞給我們的溫柔訊息。
+      </p>
+      <p>
+        在這裡，我們特別結合了「國曆」與「農曆」的雙重系統：
+      </p>
+      <div class="highlight-box">
+        <strong>國曆</strong>代表著你的想法、你的工作、你給別人的印象；<br>
+        而<strong>農曆</strong>密碼則代表你對關係、感情，以及潛意識。
+      </div>
+      <p>
+        透過神仙數字去了解這張生命藍圖，重點其實是要證明：你所執著的、你所經歷的痛苦與快樂，很多時候都是靈魂早已設定好的「程式」。但請放心，既然是程式，我們就能一起解開密碼，不再被慣性綁架，進而活出最高版本的自己。
+      </p>
+      <p>
+        我之所以想將神仙數字傳播出去，是希望能在這個偶爾令人感到疲憊的世界裡，用我綿薄的知識，帶給正在痛苦或煎熬中的人們一點點慰藉。希望這份用愛灌注的數字解析，能陪你找回屬於自己的力量，與對的頻率重新對齊。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 第二部分：主命數計算 -->
+<section id="calculator">
+  <div class="wrap">
+    <div style="text-align:center; margin-bottom:2rem;">
+      <span class="sec-tag">PART 02 · 解開你的密碼</span>
+      <h2 class="sec-title">解碼你的生命藍圖</h2>
+      <div class="sec-line"></div>
+    </div>
+    <p class="calc-desc">輸入你的國曆與農曆出生日期，按下解碼，<br>讓數字告訴你靈魂最深處的訊息。</p>
+
+    <div class="calc-card card">
+      <div class="inputs-grid">
+        <!-- 國曆 -->
+        <div class="date-box">
+          <div class="date-box-head">
+            <span class="cal-tag">國曆</span>
+            <span>陽曆出生日期</span>
+            <span class="cal-note">想法 · 工作 · 外在</span>
+          </div>
+          <div class="date-fields">
+            <div class="f-group">
+              <label>年份</label>
+              <input type="number" id="sy" placeholder="例：1989" min="1900" max="2025" />
+            </div>
+            <div class="f-group">
+              <label>月份</label>
+              <select id="sm">
+                <option value="">月</option>
+                <option value="1">1月</option><option value="2">2月</option>
+                <option value="3">3月</option><option value="4">4月</option>
+                <option value="5">5月</option><option value="6">6月</option>
+                <option value="7">7月</option><option value="8">8月</option>
+                <option value="9">9月</option><option value="10">10月</option>
+                <option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label>日期</label>
+              <select id="sd"><option value="">日</option></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 農曆 -->
+        <div class="date-box">
+          <div class="date-box-head">
+            <span class="cal-tag">農曆</span>
+            <span>陰曆出生日期</span>
+            <span class="cal-note">關係 · 感情 · 潛意識</span>
+          </div>
+          <div class="date-fields">
+            <div class="f-group">
+              <label>年份</label>
+              <input type="number" id="ly" placeholder="例：1989" min="1900" max="2025" />
+            </div>
+            <div class="f-group">
+              <label>月份</label>
+              <select id="lm">
+                <option value="">月</option>
+                <option value="1">1月</option><option value="2">2月</option>
+                <option value="3">3月</option><option value="4">4月</option>
+                <option value="5">5月</option><option value="6">6月</option>
+                <option value="7">7月</option><option value="8">8月</option>
+                <option value="9">9月</option><option value="10">10月</option>
+                <option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label>日期</label>
+              <select id="ld"><option value="">日</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="decode-btn" onclick="decode()">✦ 解碼 ✦</button>
+
+      <!-- 結果 -->
+      <div id="resultArea" class="result-area">
+        <div class="result-grid">
+          <div id="solarCard" class="r-card card" style="display:none;">
+            <div class="r-type">國 曆 主 命 數</div>
+            <div class="r-num" id="sNum">—</div>
+            <div class="r-desc" id="sDesc"></div>
+          </div>
+          <div id="lunarCard" class="r-card card" style="display:none;">
+            <div class="r-type">農 曆 主 命 數</div>
+            <div class="r-num" id="lNum">—</div>
+            <div class="r-desc" id="lDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 第三部分：服務項目 -->
+<section id="services">
+  <div class="wrap">
+    <div style="text-align:center; margin-bottom:1rem;">
+      <span class="sec-tag">PART 03 · 專屬指引</span>
+      <h2 class="sec-title">讓數字陪你<br>找回靈魂的輕盈與力量</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <p class="svc-intro">
+      如果剛剛的簡短解析讓你有所共鳴，或者你正處於人生的迷惘期，歡迎透過更深度的解析，讓我陪你一起解開密碼，看見生命更多的可能性。
+    </p>
+
+    <div class="notice">
+      <strong>✦ 溫柔提醒：神仙數字不是算命 ✦</strong>
+      神仙數字並不是用來鐵口直斷你的未來，而是一套幫助你「看見自己」的覺察工具。我們不預測宿命，而是透過理解數字的能量頻率，陪你跳脫慣性、找回內在的力量與選擇權。<br>
+      你的未來，始終由你自己創造。
+    </div>
+
+    <div class="svc-list">
+      <div class="svc-item card">
+        <div class="svc-n">1</div>
+        <div>
+          <div class="svc-t">神仙數字｜生命藍圖解鎖與流年解析</div>
+          <div class="svc-d">看懂你今生要主修的數字是什麼。當我們理解並學會活出數字的「高頻狀態」時，人生的齒輪便會自然順行。適合想要全面了解自我潛能與靈魂課題的你。</div>
+        </div>
+      </div>
+      <div class="svc-item card">
+        <div class="svc-n">2</div>
+        <div>
+          <div class="svc-t">神仙數字｜專屬卡關點解答與流年解析</div>
+          <div class="svc-d">生活中遇到了解不開的結嗎？這項服務為你保留完全的自由提問空間。針對你目前遇到的難題與卡關點，我們將運用神仙數字的能量來為你解開盲點。</div>
+        </div>
+      </div>
+      <div class="svc-item card">
+        <div class="svc-n">3</div>
+        <div>
+          <div class="svc-t">神仙數字｜關係合盤解析</div>
+          <div class="svc-d">人際關係的互動，其實都藏在數字的頻率裡。無論你想看的是另一半、孩子、老闆還是同事，我們都能透過數字的角度，看懂彼此的能量場與互動模式。</div>
+        </div>
+      </div>
+      <div class="svc-item card">
+        <div class="svc-n">4</div>
+        <div>
+          <div class="svc-t">神仙數字初階課程｜一對一 / 一對多教學</div>
+          <div class="svc-d">給對生命密碼充滿好奇的你！如果你也想親自學會這套溫暖的工具，邀請你一起加入解碼的行列。在課程中探索數字的奧妙，一步步學會看懂自己與他人的靈魂設定。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="book-area">
+      <p>準備好了嗎？讓我們一起，從數字出發。</p>
+      <!--
+        TODO：將下方 href 換成你的 Calendly 預約連結
+        例如：https://calendly.com/你的帳號
+      -->
+      <a href="https://calendly.com/michellehuanggraham/30min" target="_blank" class="book-btn">
+        預約專屬諮詢
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">✦ 神仙數字</div>
+  <p class="ft-sub">讓數字帶你回到生命本質</p>
+  <a href="https://www.instagram.com/hey_loveyourself868/" target="_blank" class="ig-btn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+    </svg>
+    @hey_loveyourself868
+  </a>
+  <p class="ft-copy">© 2025 神仙數字 · 版權所有 · 數字解析僅供自我覺察參考</p>
+</footer>
+
+<script>
+/* ── 星空動畫 ── */
+(function(){
+  const c = document.getElementById('starCanvas');
+  const ctx = c.getContext('2d');
+  function resize(){ c.width = innerWidth; c.height = innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const stars = Array.from({length:240}, () => ({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight,
+    r: Math.random() * 1.5 + 0.3,
+    o: Math.random(),
+    d: (Math.random() - 0.5) * 0.012
+  }));
+  function draw(){
+    ctx.clearRect(0, 0, c.width, c.height);
+    stars.forEach(s => {
+      s.o += s.d;
+      if (s.o > 1 || s.o < 0.05) s.d *= -1;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,162,39,${s.o.toFixed(2)})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── 填充日期選單 ── */
+function fillDays(selId, max) {
+  const sel = document.getElementById(selId);
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">日</option>';
+  for (let i = 1; i <= max; i++) {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = i + '日';
+    sel.appendChild(o);
+  }
+  if (prev && +prev <= max) sel.value = prev;
+}
+function solarMax() {
+  const y = +document.getElementById('sy').value || 2000;
+  const m = +document.getElementById('sm').value;
+  if (!m) return 31;
+  if ([4,6,9,11].includes(m)) return 30;
+  if (m === 2) return (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28;
+  return 31;
+}
+document.getElementById('sm').addEventListener('change', () => fillDays('sd', solarMax()));
+document.getElementById('sy').addEventListener('change', () => {
+  if (+document.getElementById('sm').value === 2) fillDays('sd', solarMax());
+});
+document.getElementById('lm').addEventListener('change', () => fillDays('ld', 30));
+fillDays('sd', 31);
+fillDays('ld', 30);
+
+/* ── 數字描述 ── */
+const SOLAR = {
+  1: '專業決定了你的底氣，深耕專業、累積實力，自信自然就會展現。',
+  2: '總是考慮對方立場來遷就對方嗎？溫柔又體貼的你可以試著表達真實的自己，成為強而有力的合作連結者。',
+  3: '你是很會說話還是相對寡言呢？無論如何，3 的能量在口，記得不管遇到什麼事情，都要多說自己的好話，話語自帶能量，可以創造你想要的世界。',
+  4: '你是來建構組織、建構系統的，你在你建構的世界感受安全感，也把你愛的人視為責任照顧。但別忘了也要好好照顧自己，保護好自己的能量場。',
+  5: '你心裡想要的自由是什麼？有好多事情想要做想要完成，但還在原地踏步。當你能真正依心而為，為自己全然負起責任時，心到哪都能安放。',
+  6: '追求完美是不是讓你有點累了？其實沒有任何的人事物需要事事完美，包括你自己也一樣。不完美也是美，你已經很好很美了。',
+  7: '今天要不要試試看放輕鬆一下，跟著自己的直覺走？你可能會發現事情的進展比平常更順利。放下懷疑的種子，學著相信你的直覺。',
+  8: '追求在物質世界的成功，你是有領導力也有氣魄的。記得在籌備任何事情前，可以等到計畫有雛型後再公告，這樣成功的機率會大大提升。',
+  9: '你常常覺得懶洋洋，或是有很多想法在腦中跑嗎？我們一起來落實吧！懂得如何實踐才能活出真實人生，進而分享服務眾人。'
+};
+const LUNAR = {
+  1: '對於你來說存在的意義是什麼呢？有沒有可能你本身的存在就是有意義的，你不需要汲汲營營地追求去證明自己。',
+  2: '委屈不一定能求全，接受自己的全部、真實地表達自己，才能吸引真誠的人際關係。',
+  3: '你擔心別人怎麼看你嗎？想做一件事但對未來有所恐懼，怕沒有成功、承受不住旁人的目光。試著不要臉一點吧，人生要玩得盡興！',
+  4: '凡是你想控制的，可能也在控制你。你能看穿不安全感中的恐懼是什麼嗎？記得無論何時，誠實面對自己與他人，真實是禁得起考驗的。',
+  5: '自由不是你今天身處在狹小的辦公室還是美麗的異鄉街道上，有心才有動能。找到能讓你內心悸動不已的事情吧！',
+  6: '你有好好地愛自己嗎？所有一切的愛都是先從愛自己練習。當你了解尊重自己、愛自己是什麼感覺，你才會用相同的方式愛別人。',
+  7: '你本來就是帶著幸運下來的，但你是不是不覺得自己是個幸運星呢？不如我們一起練習放下懷疑，不要應證，相信直覺、學著感恩，你會發現這世界變得好可愛。',
+  8: '你擁有很強的顯化能力，顯化不只能顯化好的，也有可能顯化不好的，所以我們要練習對於你的所思所想都保持高度的覺知。',
+  9: '謝謝你來人生走這一遭。你有可能上輩子的課業已修圓滿，但又為了某人下來玩一次。希望我們能一起在看懂人性黑暗面後，依然想走入人群、服務人群。'
+};
+
+/* ── 計算主命數 ── */
+function reduce(n) {
+  while (n > 9) {
+    let s = 0, t = n;
+    while (t > 0) { s += t % 10; t = Math.floor(t / 10); }
+    n = s;
+  }
+  return n;
+}
+function lifeNum(y, m, d) {
+  let sum = 0;
+  for (const ch of String(y) + String(m) + String(d)) sum += +ch;
+  return reduce(sum);
+}
+
+/* ── 解碼 ── */
+function decode() {
+  const sy = document.getElementById('sy').value;
+  const sm = document.getElementById('sm').value;
+  const sd = document.getElementById('sd').value;
+  const ly = document.getElementById('ly').value;
+  const lm = document.getElementById('lm').value;
+  const ld = document.getElementById('ld').value;
+
+  const hasSolar = sy && sm && sd;
+  const hasLunar = ly && lm && ld;
+
+  if (!hasSolar && !hasLunar) {
+    alert('請至少填寫一種曆法的完整出生年月日！');
+    return;
+  }
+
+  const area = document.getElementById('resultArea');
+  const sCard = document.getElementById('solarCard');
+  const lCard = document.getElementById('lunarCard');
+
+  if (hasSolar) {
+    const n = lifeNum(+sy, +sm, +sd);
+    document.getElementById('sNum').textContent = n;
+    document.getElementById('sDesc').textContent = SOLAR[n];
+    sCard.style.display = 'block';
+  } else {
+    sCard.style.display = 'none';
+  }
+
+  if (hasLunar) {
+    const n = lifeNum(+ly, +lm, +ld);
+    document.getElementById('lNum').textContent = n;
+    document.getElementById('lDesc').textContent = LUNAR[n];
+    lCard.style.display = 'block';
+  } else {
+    lCard.style.display = 'none';
+  }
+
+  area.classList.remove('show');
+  requestAnimationFrame(() => {
+    area.classList.add('show');
+    area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+</script>
+</body>
+</html>

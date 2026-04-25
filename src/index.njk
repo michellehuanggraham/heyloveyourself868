@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ settings.site_title }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:         #F0E4DC;
+      --bg-alt:     #E4D4CC;
+      --bg-card:    rgba(255,248,244,0.80);
+      --gold:       #8A6060;
+      --gold-light: #A87878;
+      --gold-hover: #6A4848;
+      --gold-pale:  rgba(138,96,96,0.10);
+      --gold-border:rgba(138,96,96,0.22);
+      --text:       #261018;
+      --text-mid:   #5A3040;
+      --text-dim:   #8A6070;
+      --shadow:     rgba(138,96,96,0.10);
+      --radius:     16px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Noto Serif TC', serif;
+      overflow-x:hidden;
+      line-height:1.85;
+    }
+
+    /* ── STARS ── */
+    #starCanvas {
+      display:none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; width:100%; z-index:100;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:1rem 2.5rem;
+      background:rgba(240,228,220,0.93);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--gold-border);
+    }
+    .nav-logo { color:var(--gold); font-size:1.1rem; font-weight:600; letter-spacing:.08em; }
+    .nav-links a {
+      color:var(--text-dim); text-decoration:none;
+      margin-left:2rem; font-size:.88rem; transition:color .2s;
+    }
+    .nav-links a:hover { color:var(--gold); }
+
+    /* ── HELPERS ── */
+    .wrap { max-width:900px; margin:0 auto; position:relative; z-index:1; }
+    .sec-tag {
+      display:block; text-align:center;
+      font-size:.72rem; letter-spacing:.35em;
+      color:var(--gold); margin-bottom:.7rem; opacity:.8;
+    }
+    .sec-title {
+      font-size:clamp(1.7rem,4vw,2.5rem);
+      font-weight:700; color:var(--text);
+      text-align:center; line-height:1.4;
+    }
+    .sec-line {
+      width:44px; height:2px;
+      background:linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin:.9rem auto 0;
+    }
+    .card {
+      background:var(--bg-card);
+      backdrop-filter:blur(16px);
+      border:1px solid var(--gold-border);
+      border-radius:var(--radius);
+      box-shadow:0 4px 30px var(--shadow);
+    }
+
+    /* ── HERO ── */
+    #home {
+      position:relative; z-index:1;
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center;
+      padding:8rem 1.5rem 5rem;
+    }
+    .hero-badge {
+      font-size:.72rem; letter-spacing:.4em;
+      color:var(--gold); margin-bottom:1.4rem; opacity:.7;
+    }
+    .hero-title {
+      font-size:clamp(2rem,6vw,3.6rem);
+      font-weight:700; color:var(--text);
+      line-height:1.3; margin-bottom:1.4rem;
+      animation:titleGlow 4s ease-in-out infinite;
+    }
+    .hero-title em {
+      color:var(--gold); font-style:normal;
+      text-shadow:0 0 30px rgba(201,162,39,0.5);
+    }
+    @keyframes titleGlow {
+      0%,100%{ text-shadow:none; }
+      50%{ text-shadow:0 0 40px rgba(201,162,39,0.2); }
+    }
+    .hero-sub {
+      font-size:clamp(.9rem,2vw,1.05rem);
+      color:var(--text-mid); letter-spacing:.05em;
+      max-width:440px;
+    }
+    .hero-scroll {
+      margin-top:3rem; color:var(--gold); opacity:.5;
+      animation:bounce 2.4s ease-in-out infinite;
+    }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+    /* ── ABOUT ── */
+    #about { padding:6rem 1.5rem; position:relative; z-index:1; }
+    .about-body { max-width:720px; margin:0 auto; }
+    .about-body p {
+      color:var(--text-mid); line-height:2.25;
+      font-size:1rem; margin-bottom:1.8rem;
+    }
+    .about-body p:last-child { margin-bottom:0; }
+    .highlight-box {
+      background:var(--gold-pale);
+      border-left:3px solid var(--gold);
+      border-radius:0 12px 12px 0;
+      padding:1.3rem 1.8rem;
+      margin:2rem 0;
+      color:var(--text);
+      font-size:.97rem; line-height:2.15;
+    }
+
+    /* ── CALCULATOR ── */
+    #calculator { padding:6rem 1.5rem; position:relative; z-index:1; background:rgba(228,212,204,0.55); }
+    .calc-card { padding:2.5rem 2rem; }
+    .calc-desc {
+      text-align:center; color:var(--text-mid);
+      font-size:.92rem; margin:.8rem 0 2.5rem; line-height:1.9;
+    }
+    .inputs-grid {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:1.5rem; margin-bottom:1.5rem;
+    }
+    .date-box {
+      background:rgba(201,162,39,0.05);
+      border:1px solid var(--gold-border);
+      border-radius:12px; padding:1.6rem;
+    }
+    .date-box-head {
+      font-size:.88rem; font-weight:600; color:var(--text);
+      margin-bottom:1.1rem; display:flex; align-items:center; gap:.6rem;
+    }
+    .cal-tag {
+      font-size:.68rem; background:var(--gold);
+      color:#0d0618; padding:.12rem .55rem; border-radius:50px; font-weight:700;
+    }
+    .cal-note { font-size:.75rem; color:var(--text-dim); font-weight:400; }
+    .date-fields { display:grid; grid-template-columns:repeat(3,1fr); gap:.7rem; }
+    .f-group { display:flex; flex-direction:column; gap:.35rem; }
+    .f-group label { font-size:.75rem; color:var(--text-dim); }
+    .f-group input, .f-group select {
+      background:rgba(201,162,39,0.07);
+      border:1px solid var(--gold-border);
+      border-radius:8px;
+      padding:.55rem .7rem;
+      color:var(--text);
+      font-size:.88rem;
+      font-family:'Noto Serif TC', serif;
+      transition:border-color .2s, background .2s;
+      width:100%; -webkit-appearance:none;
+    }
+    .f-group input:focus, .f-group select:focus {
+      outline:none; border-color:var(--gold);
+      background:rgba(201,162,39,0.13);
+    }
+    .f-group select option { background:#F0E4DC; color:var(--text); }
+    .leap-check {
+      margin-top:.8rem; display:flex; align-items:center; gap:.5rem;
+      font-size:.8rem; color:var(--text-dim); cursor:pointer;
+    }
+    .leap-check input { width:14px; height:14px; accent-color:var(--gold); cursor:pointer; }
+
+    .decode-btn {
+      width:100%; padding:1rem 2rem;
+      background:linear-gradient(135deg, #8A6060, #C49090);
+      border:none; border-radius:50px;
+      color:white; font-size:1.05rem;
+      font-family:'Noto Serif TC', serif; font-weight:600;
+      cursor:pointer; letter-spacing:.18em;
+      transition:all .3s;
+      box-shadow:0 4px 22px rgba(201,162,39,0.30);
+    }
+    .decode-btn:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(201,162,39,0.45); }
+
+    /* Results */
+    .result-area { display:none; margin-top:2rem; }
+    .result-area.show { display:block; animation:fadeUp .45s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .r-card { padding:2rem 1.5rem; text-align:center; }
+    .r-type { font-size:.7rem; letter-spacing:.3em; color:var(--text-dim); margin-bottom:.8rem; }
+    .r-num {
+      font-size:5rem; font-weight:700; color:var(--gold); line-height:1;
+      margin-bottom:.3rem; text-shadow:0 0 30px rgba(201,162,39,0.5);
+    }
+    .r-desc {
+      color:var(--text-mid); font-size:.88rem; line-height:2;
+      text-align:left;
+      background:rgba(0,0,0,0.2); border-radius:10px;
+      padding:1rem 1.2rem; margin-top:1rem;
+    }
+
+    /* ── SERVICES ── */
+    #services { padding:6rem 1.5rem; position:relative; z-index:1; }
+    .svc-intro {
+      max-width:660px; margin:1.5rem auto 2.5rem;
+      text-align:center; color:var(--text-mid);
+      font-size:.97rem; line-height:2.2;
+    }
+    .notice {
+      background:var(--gold-pale);
+      border:1px solid var(--gold-border);
+      border-radius:var(--radius);
+      padding:1.5rem 2rem; margin-bottom:2.5rem;
+      text-align:center; font-size:.9rem;
+      color:var(--text-mid); line-height:2.1;
+    }
+    .notice strong { color:var(--gold); font-size:.95rem; display:block; margin-bottom:.5rem; }
+    .svc-list { display:flex; flex-direction:column; gap:1.2rem; margin-bottom:3rem; }
+    .svc-item {
+      display:flex; gap:1.5rem; padding:2rem 2rem;
+      align-items:flex-start; transition:transform .25s, border-color .25s;
+    }
+    .svc-item:hover { transform:translateX(4px); border-color:rgba(201,162,39,0.5); }
+    .svc-n {
+      font-size:2.2rem; font-weight:700; color:var(--gold);
+      opacity:.35; flex-shrink:0; line-height:1; padding-top:.15rem;
+    }
+    .svc-t { font-size:1rem; font-weight:600; color:var(--text); margin-bottom:.45rem; }
+    .svc-d { font-size:.9rem; color:var(--text-mid); line-height:1.95; }
+
+    .book-area { text-align:center; padding-top:1rem; }
+    .book-area p { color:var(--text-mid); margin-bottom:1.3rem; font-size:.97rem; }
+    .book-btn {
+      display:inline-block; padding:.9rem 2.8rem;
+      background:linear-gradient(135deg, var(--gold), #A8851C);
+      color:#0d0618; text-decoration:none;
+      border-radius:50px; font-weight:700; font-size:.97rem;
+      letter-spacing:.1em; transition:all .3s;
+      box-shadow:0 4px 18px rgba(201,162,39,0.30);
+    }
+    .book-btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(201,162,39,0.45); }
+
+    /* ── FOOTER ── */
+    footer {
+      position:relative; z-index:1;
+      background:rgba(8,4,18,0.95);
+      border-top:1px solid var(--gold-border);
+      padding:3rem 1.5rem; text-align:center;
+    }
+    .ft-logo { color:var(--gold); font-size:1.3rem; font-weight:600; margin-bottom:.4rem; }
+    .ft-sub { color:var(--text-dim); font-size:.82rem; margin-bottom:1.5rem; }
+    .ig-btn {
+      display:inline-flex; align-items:center; gap:.55rem;
+      color:var(--text-mid); text-decoration:none; font-size:.92rem;
+      padding:.65rem 2rem;
+      border:1px solid var(--gold-border);
+      border-radius:50px; transition:all .3s;
+    }
+    .ig-btn:hover {
+      background:linear-gradient(135deg,#E1306C,#833AB4,#FCAF45);
+      border-color:transparent; color:white;
+    }
+    .ft-copy { color:var(--text-dim); opacity:.4; font-size:.72rem; margin-top:1.5rem; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:680px){
+      .inputs-grid, .result-grid { grid-template-columns:1fr; }
+      .nav-links { display:none; }
+      .calc-card { padding:1.8rem 1.2rem; }
+      .svc-item { padding:1.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">{{ settings.nav_logo }}</div>
+  <div class="nav-links">
+    <a href="#about">{{ settings.nav_about }}</a>
+    <a href="#calculator">{{ settings.nav_calculator }}</a>
+    <a href="#services">{{ settings.nav_services }}</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-badge">{{ hero.badge }}</div>
+  <h1 class="hero-title">{{ hero.title_plain }}<br><em>{{ hero.title_em }}</em></h1>
+  <p class="hero-sub">{{ hero.subtitle }}</p>
+  <div class="hero-scroll">
+    <svg width="22" height="36" viewBox="0 0 22 36" fill="none">
+      <rect x="1" y="1" width="20" height="28" rx="10" stroke="currentColor" stroke-width="1.6"/>
+      <line x1="11" y1="7" x2="11" y2="15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M5 31 L11 35.5 L17 31" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<!-- 第一部分：關於神仙數字 -->
+<section id="about">
+  <div class="wrap">
+    <div style="text-align:center; margin-bottom:3rem;">
+      <span class="sec-tag">{{ about.section_tag }}</span>
+      <h2 class="sec-title">{{ about.title }}</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="about-body">
+      <p>{{ about.para1 }}</p>
+      <p>{{ about.para2 }}</p>
+      <div class="highlight-box">
+        <strong>國曆</strong>{{ about.highlight_solar_text }}<br>
+        而<strong>農曆</strong>{{ about.highlight_lunar_text }}
+      </div>
+      <p>{{ about.para3 }}</p>
+      <p>{{ about.para4 }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- 第二部分：主命數計算 -->
+<section id="calculator">
+  <div class="wrap">
+    <div style="text-align:center; margin-bottom:2rem;">
+      <span class="sec-tag">PART 02 · 解開你的密碼</span>
+      <h2 class="sec-title">解碼你的生命藍圖</h2>
+      <div class="sec-line"></div>
+    </div>
+    <p class="calc-desc">輸入你的國曆與農曆出生日期，按下解碼，<br>讓數字告訴你靈魂最深處的訊息。</p>
+
+    <div class="calc-card card">
+      <div class="inputs-grid">
+        <!-- 國曆 -->
+        <div class="date-box">
+          <div class="date-box-head">
+            <span class="cal-tag">國曆</span>
+            <span>陽曆出生日期</span>
+            <span class="cal-note">想法 · 工作 · 外在</span>
+          </div>
+          <div class="date-fields">
+            <div class="f-group">
+              <label>年份</label>
+              <input type="number" id="sy" placeholder="例：1989" min="1900" max="2025" />
+            </div>
+            <div class="f-group">
+              <label>月份</label>
+              <select id="sm">
+                <option value="">月</option>
+                <option value="1">1月</option><option value="2">2月</option>
+                <option value="3">3月</option><option value="4">4月</option>
+                <option value="5">5月</option><option value="6">6月</option>
+                <option value="7">7月</option><option value="8">8月</option>
+                <option value="9">9月</option><option value="10">10月</option>
+                <option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label>日期</label>
+              <select id="sd"><option value="">日</option></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 農曆 -->
+        <div class="date-box">
+          <div class="date-box-head">
+            <span class="cal-tag">農曆</span>
+            <span>陰曆出生日期</span>
+            <span class="cal-note">關係 · 感情 · 潛意識</span>
+          </div>
+          <div class="date-fields">
+            <div class="f-group">
+              <label>年份</label>
+              <input type="number" id="ly" placeholder="例：1989" min="1900" max="2025" />
+            </div>
+            <div class="f-group">
+              <label>月份</label>
+              <select id="lm">
+                <option value="">月</option>
+                <option value="1">1月</option><option value="2">2月</option>
+                <option value="3">3月</option><option value="4">4月</option>
+                <option value="5">5月</option><option value="6">6月</option>
+                <option value="7">7月</option><option value="8">8月</option>
+                <option value="9">9月</option><option value="10">10月</option>
+                <option value="11">11月</option><option value="12">12月</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label>日期</label>
+              <select id="ld"><option value="">日</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="decode-btn" onclick="decode()">✦ 解碼 ✦</button>
+
+      <!-- 結果 -->
+      <div id="resultArea" class="result-area">
+        <div class="result-grid">
+          <div id="solarCard" class="r-card card" style="display:none;">
+            <div class="r-type">國 曆 主 命 數</div>
+            <div class="r-num" id="sNum">—</div>
+            <div class="r-desc" id="sDesc"></div>
+          </div>
+          <div id="lunarCard" class="r-card card" style="display:none;">
+            <div class="r-type">農 曆 主 命 數</div>
+            <div class="r-num" id="lNum">—</div>
+            <div class="r-desc" id="lDesc"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 第三部分：服務項目 -->
+<section id="services">
+  <div class="wrap">
+    <div style="text-align:center; margin-bottom:1rem;">
+      <span class="sec-tag">{{ services.section_tag }}</span>
+      <h2 class="sec-title">{{ services.title_line1 }}<br>{{ services.title_line2 }}</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <p class="svc-intro">{{ services.intro }}</p>
+
+    <div class="notice">
+      <strong>{{ services.notice_title }}</strong>
+      {{ services.notice_body }}<br>
+      {{ services.notice_footer }}
+    </div>
+
+    <div class="svc-list">
+      {% for item in services.items %}
+      <div class="svc-item card">
+        <div class="svc-n">{{ loop.index }}</div>
+        <div>
+          <div class="svc-t">{{ item.title }}</div>
+          <div class="svc-d">{{ item.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="book-area">
+      <p>{{ services.booking_text }}</p>
+      <a href="{{ settings.calendly_url }}" target="_blank" class="book-btn">
+        {{ services.booking_button }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">{{ settings.footer_logo }}</div>
+  <p class="ft-sub">{{ settings.footer_tagline }}</p>
+  <a href="{{ settings.instagram_url }}" target="_blank" class="ig-btn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+    </svg>
+    {{ settings.instagram_handle }}
+  </a>
+  <p class="ft-copy">{{ settings.footer_copyright }}</p>
+</footer>
+
+<script>
+/* ── 星空動畫 ── */
+(function(){
+  const c = document.getElementById('starCanvas');
+  const ctx = c.getContext('2d');
+  function resize(){ c.width = innerWidth; c.height = innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const stars = Array.from({length:240}, () => ({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight,
+    r: Math.random() * 1.5 + 0.3,
+    o: Math.random(),
+    d: (Math.random() - 0.5) * 0.012
+  }));
+  function draw(){
+    ctx.clearRect(0, 0, c.width, c.height);
+    stars.forEach(s => {
+      s.o += s.d;
+      if (s.o > 1 || s.o < 0.05) s.d *= -1;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,162,39,${s.o.toFixed(2)})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── 填充日期選單 ── */
+function fillDays(selId, max) {
+  const sel = document.getElementById(selId);
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">日</option>';
+  for (let i = 1; i <= max; i++) {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = i + '日';
+    sel.appendChild(o);
+  }
+  if (prev && +prev <= max) sel.value = prev;
+}
+function solarMax() {
+  const y = +document.getElementById('sy').value || 2000;
+  const m = +document.getElementById('sm').value;
+  if (!m) return 31;
+  if ([4,6,9,11].includes(m)) return 30;
+  if (m === 2) return (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28;
+  return 31;
+}
+document.getElementById('sm').addEventListener('change', () => fillDays('sd', solarMax()));
+document.getElementById('sy').addEventListener('change', () => {
+  if (+document.getElementById('sm').value === 2) fillDays('sd', solarMax());
+});
+document.getElementById('lm').addEventListener('change', () => fillDays('ld', 30));
+fillDays('sd', 31);
+fillDays('ld', 30);
+
+/* ── 數字描述（由 CMS 管理） ── */
+const SOLAR = {
+  1: {{ numerology.solar.n1 | dump | safe }},
+  2: {{ numerology.solar.n2 | dump | safe }},
+  3: {{ numerology.solar.n3 | dump | safe }},
+  4: {{ numerology.solar.n4 | dump | safe }},
+  5: {{ numerology.solar.n5 | dump | safe }},
+  6: {{ numerology.solar.n6 | dump | safe }},
+  7: {{ numerology.solar.n7 | dump | safe }},
+  8: {{ numerology.solar.n8 | dump | safe }},
+  9: {{ numerology.solar.n9 | dump | safe }}
+};
+const LUNAR = {
+  1: {{ numerology.lunar.n1 | dump | safe }},
+  2: {{ numerology.lunar.n2 | dump | safe }},
+  3: {{ numerology.lunar.n3 | dump | safe }},
+  4: {{ numerology.lunar.n4 | dump | safe }},
+  5: {{ numerology.lunar.n5 | dump | safe }},
+  6: {{ numerology.lunar.n6 | dump | safe }},
+  7: {{ numerology.lunar.n7 | dump | safe }},
+  8: {{ numerology.lunar.n8 | dump | safe }},
+  9: {{ numerology.lunar.n9 | dump | safe }}
+};
+
+/* ── 計算主命數 ── */
+function reduce(n) {
+  while (n > 9) {
+    let s = 0, t = n;
+    while (t > 0) { s += t % 10; t = Math.floor(t / 10); }
+    n = s;
+  }
+  return n;
+}
+function lifeNum(y, m, d) {
+  let sum = 0;
+  for (const ch of String(y) + String(m) + String(d)) sum += +ch;
+  return reduce(sum);
+}
+
+/* ── 解碼 ── */
+function decode() {
+  const sy = document.getElementById('sy').value;
+  const sm = document.getElementById('sm').value;
+  const sd = document.getElementById('sd').value;
+  const ly = document.getElementById('ly').value;
+  const lm = document.getElementById('lm').value;
+  const ld = document.getElementById('ld').value;
+
+  const hasSolar = sy && sm && sd;
+  const hasLunar = ly && lm && ld;
+
+  if (!hasSolar && !hasLunar) {
+    alert('請至少填寫一種曆法的完整出生年月日！');
+    return;
+  }
+
+  const area = document.getElementById('resultArea');
+  const sCard = document.getElementById('solarCard');
+  const lCard = document.getElementById('lunarCard');
+
+  if (hasSolar) {
+    const n = lifeNum(+sy, +sm, +sd);
+    document.getElementById('sNum').textContent = n;
+    document.getElementById('sDesc').textContent = SOLAR[n];
+    sCard.style.display = 'block';
+  } else {
+    sCard.style.display = 'none';
+  }
+
+  if (hasLunar) {
+    const n = lifeNum(+ly, +lm, +ld);
+    document.getElementById('lNum').textContent = n;
+    document.getElementById('lDesc').textContent = LUNAR[n];
+    lCard.style.display = 'block';
+  } else {
+    lCard.style.display = 'none';
+  }
+
+  area.classList.remove('show');
+  requestAnimationFrame(() => {
+    area.classList.add('show');
+    area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+</script>
+
+<!-- Netlify Identity：登入後導向管理後台 -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on('init', function(user) {
+      if (!user) {
+        window.netlifyIdentity.on('login', function() {
+          document.location.href = '/admin/';
+        });
+      }
+    });
+  }
+</script>
+</body>
+</html>

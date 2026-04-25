@@ -1,0 +1,114 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Uncomment the line below to test the CMS locally with `npx decap-server`
+# local_backend: true
+
+media_folder: "src/images"
+public_folder: "/images"
+
+collections:
+  - name: "settings"
+    label: "⚙️ 網站設定"
+    files:
+      - label: "全域設定"
+        name: "settings"
+        file: "src/_data/settings.json"
+        format: json
+        fields:
+          - { label: "網站標題（瀏覽器分頁顯示）", name: "site_title", widget: "string" }
+          - { label: "導覽列 Logo 文字", name: "nav_logo", widget: "string" }
+          - { label: "導覽列：關於連結文字", name: "nav_about", widget: "string" }
+          - { label: "導覽列：解碼連結文字", name: "nav_calculator", widget: "string" }
+          - { label: "導覽列：服務連結文字", name: "nav_services", widget: "string" }
+          - { label: "Calendly 預約連結網址", name: "calendly_url", widget: "string" }
+          - { label: "Instagram 帳號顯示名稱", name: "instagram_handle", widget: "string" }
+          - { label: "Instagram 連結網址", name: "instagram_url", widget: "string" }
+          - { label: "頁尾 Logo 文字", name: "footer_logo", widget: "string" }
+          - { label: "頁尾標語", name: "footer_tagline", widget: "string" }
+          - { label: "頁尾版權聲明", name: "footer_copyright", widget: "string" }
+
+  - name: "pages"
+    label: "📝 頁面內容"
+    files:
+      - label: "首頁英雄區塊"
+        name: "hero"
+        file: "src/_data/hero.json"
+        format: json
+        fields:
+          - { label: "英文小標語（上方小字）", name: "badge", widget: "string" }
+          - { label: "標題第一行", name: "title_plain", widget: "string" }
+          - { label: "標題第二行（強調色顯示）", name: "title_em", widget: "string" }
+          - { label: "副標題文字", name: "subtitle", widget: "string" }
+
+      - label: "關於神仙數字"
+        name: "about"
+        file: "src/_data/about.json"
+        format: json
+        fields:
+          - { label: "區塊標籤（小字）", name: "section_tag", widget: "string" }
+          - { label: "區塊標題", name: "title", widget: "string" }
+          - { label: "第一段落", name: "para1", widget: "text" }
+          - { label: "第二段落", name: "para2", widget: "text" }
+          - { label: "重點框：國曆說明（接在「國曆」後面）", name: "highlight_solar_text", widget: "text" }
+          - { label: "重點框：農曆說明（接在「農曆」後面）", name: "highlight_lunar_text", widget: "text" }
+          - { label: "第三段落", name: "para3", widget: "text" }
+          - { label: "第四段落", name: "para4", widget: "text" }
+
+      - label: "服務項目"
+        name: "services"
+        file: "src/_data/services.json"
+        format: json
+        fields:
+          - { label: "區塊標籤（小字）", name: "section_tag", widget: "string" }
+          - { label: "標題第一行", name: "title_line1", widget: "string" }
+          - { label: "標題第二行", name: "title_line2", widget: "string" }
+          - { label: "區塊介紹文字", name: "intro", widget: "text" }
+          - { label: "溫馨提醒：標題", name: "notice_title", widget: "string" }
+          - { label: "溫馨提醒：內文", name: "notice_body", widget: "text" }
+          - { label: "溫馨提醒：結語", name: "notice_footer", widget: "string" }
+          - label: "服務項目列表"
+            name: "items"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "服務名稱", name: "title", widget: "string" }
+              - { label: "服務描述", name: "description", widget: "text" }
+          - { label: "預約呼籲文字", name: "booking_text", widget: "string" }
+          - { label: "預約按鈕文字", name: "booking_button", widget: "string" }
+
+  - name: "numerology"
+    label: "🔢 數字解析文字"
+    files:
+      - label: "主命數描述"
+        name: "numerology"
+        file: "src/_data/numerology.json"
+        format: json
+        fields:
+          - label: "國曆主命數（想法・工作・外在）"
+            name: "solar"
+            widget: "object"
+            fields:
+              - { label: "1 號：專業與底氣", name: "n1", widget: "text" }
+              - { label: "2 號：合作與平衡", name: "n2", widget: "text" }
+              - { label: "3 號：溝通與表達", name: "n3", widget: "text" }
+              - { label: "4 號：建構與責任", name: "n4", widget: "text" }
+              - { label: "5 號：自由與決斷", name: "n5", widget: "text" }
+              - { label: "6 號：完美與接納", name: "n6", widget: "text" }
+              - { label: "7 號：直覺與信任", name: "n7", widget: "text" }
+              - { label: "8 號：領導與物質", name: "n8", widget: "text" }
+              - { label: "9 號：落實與服務", name: "n9", widget: "text" }
+          - label: "農曆主命數（關係・感情・潛意識）"
+            name: "lunar"
+            widget: "object"
+            fields:
+              - { label: "1 號：自我價值", name: "n1", widget: "text" }
+              - { label: "2 號：真實與關係", name: "n2", widget: "text" }
+              - { label: "3 號：勇氣與不評判", name: "n3", widget: "text" }
+              - { label: "4 號：掌控與誠實", name: "n4", widget: "text" }
+              - { label: "5 號：內在自由", name: "n5", widget: "text" }
+              - { label: "6 號：自愛基礎", name: "n6", widget: "text" }
+              - { label: "7 號：幸運與感恩", name: "n7", widget: "text" }
+              - { label: "8 號：顯化覺知", name: "n8", widget: "text" }
+              - { label: "9 號：服務與智慧", name: "n9", widget: "text" }
